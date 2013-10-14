@@ -68,16 +68,27 @@ def BFS(start):
     if expanded.isGoal():
         return "Puzzle is already solved."
     elist=list()
+    check=list()
     while len(fringe)>0:
         expanded=fringe.popleft()
         elist.append(expanded.name)
-        if not expanded.isGoal():
+                if not expanded.isGoal():
             print(str(expanded))
             expand(expanded)
-            if expanded.left!=None: fringe.append(expanded.left)
-            if expanded.up!=None: fringe.append(expanded.up)
-            if expanded.down!=None: fringe.append(expanded.down)
-            if expanded.right!=None: fringe.append(expanded.right)
+            if expanded.left!=None:
+                check.append(expanded.left)
+            if expanded.up!=None:
+                check.append(expanded.up)
+            if expanded.down!=None:
+                check.append(expanded.down)
+            if expanded.right!=None:
+                check.append(expanded.right)
+            for n in fringe:
+                for m in check:
+                    if n.isIdentical(m): check.remove(m)
+                if not check: break
+            else:
+                fringe.extend(check)
         else: return "Solution Path Found: " + expanded.name
     return "No Solution"
 
