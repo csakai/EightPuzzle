@@ -16,7 +16,12 @@ class NPnode:
 
     def isGoal(self):
         return self.data.isGoal()
-        
+    
+    def isIdentical(self, other):
+        if isinstance(other, NPnode):
+            return self.data.order==other.data.order
+        else: return NotImplemented
+
     # a note: These comparison operators are for comparing HEURISTICS, not actual state.
     def __lt__(self, other):
         if isinstance(other, NPnode):
