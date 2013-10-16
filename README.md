@@ -9,3 +9,8 @@ This set of python modules was a test to see how much I have learned with Python
 I can use it.
 Feel free to check it out and check back for updates!
 -Chris Sakai
+
+October 16: made the code more "pythonic" by defining one search function and instead passing the
+selection type as a function to the "search" function.
+A word of warning: If iterative deepning is used and there is no possible solution, the program will enter
+into an infinite loop.

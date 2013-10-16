@@ -3,7 +3,7 @@ from NPnode import NPnode
 from collections import deque
 from random import shuffle as rdir
 
-start=NumPuzz(4, [1, 'B', 2, 4, 5, 7, 3, 8, 9, 6, 11, 12, 13, 10, 14, 15], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 'B'])
+start=NumPuzz(4, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 'B'], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 'B'])
 
 def Randomize(complexity, start):
     dirs=list()
@@ -45,13 +45,13 @@ def DFS(start):
         if not expanded.isGoal():
             print(str(expanded))
             expand(expanded)
-            if expanded.left!=None:
+            if expanded.left:
                 check.append(expanded.left)
-            if expanded.up!=None:
+            if expanded.up:
                 check.append(expanded.up)
-            if expanded.down!=None:
+            if expanded.down:
                 check.append(expanded.down)
-            if expanded.right!=None:
+            if expanded.right:
                 check.append(expanded.right)
             for n in fringe:
                 for m in check:
@@ -75,13 +75,13 @@ def BFS(start):
         if not expanded.isGoal():
             print(str(expanded))
             expand(expanded)
-            if expanded.left!=None:
+            if expanded.left:
                 check.append(expanded.left)
-            if expanded.up!=None:
+            if expanded.up:
                 check.append(expanded.up)
-            if expanded.down!=None:
+            if expanded.down:
                 check.append(expanded.down)
-            if expanded.right!=None:
+            if expanded.right:
                 check.append(expanded.right)
             for n in fringe:
                 for m in check:
@@ -105,10 +105,10 @@ def Astar(start):
         if not expanded.isGoal():
             print(str(expanded))
             expand(expanded)
-            if expanded.left!=None: fringe.append(expanded.left)
-            if expanded.up!=None: fringe.append(expanded.up)
-            if expanded.down!=None: fringe.append(expanded.down)
-            if expanded.right!=None: fringe.append(expanded.right)
+            if expanded.left: fringe.append(expanded.left)
+            if expanded.up: fringe.append(expanded.up)
+            if expanded.down: fringe.append(expanded.down)
+            if expanded.right: fringe.append(expanded.right)
         else: return "Solution Path Found: " + expanded.name
     return "No Solution"
 
@@ -129,10 +129,10 @@ def AstarDiagnostic(start):
             print(str(expanded))
             print(moardata(expanded))
             expand(expanded)
-            if expanded.left!=None: fringe.append(expanded.left)
-            if expanded.up!=None: fringe.append(expanded.up)
-            if expanded.down!=None: fringe.append(expanded.down)
-            if expanded.right!=None: fringe.append(expanded.right)
+            if expanded.left: fringe.append(expanded.left)
+            if expanded.up: fringe.append(expanded.up)
+            if expanded.down: fringe.append(expanded.down)
+            if expanded.right: fringe.append(expanded.right)
         else: print("Solution Path Found: " + expanded.name)
 
 def moardata(node):
@@ -142,49 +142,90 @@ def moardata(node):
     s+="Potential Directions is " + str(node.data.moves)+"\n"
     return s
 
-def search(fun, start):
+#the following function is a culmination for the search functions.
+#To use it, just input
+def search(fun, start, depth=None, it=False):
+    '''This function allows you to run all tree-based search functions. All you need to do is 
+        provide the type of next-node selection to the parameter 'fun'. If you are using Depth-Limited
+        Search, then you provide depth, otherwise that parameter is unnecessary. This function will
+        return a tuple holding a string with the solution path and information, and a list of all
+        expanded nodes' names if you wish to analyze them.'''
     if start.isGoal():
-        return "Puzzle is already solved."
+        return ("Puzzle is already solved.", list())
     else:
+        if it: depth=1
         fringe=deque([NPnode(start, "Start")])
         elist=list()
         while len(fringe)>0:
-            expanded, fringe = fun(fringe)
+            expanded, fringe = fun(fringe, depth)
             elist.append(expanded.name)
+            if fun==astarselect: elist[len(elist)-1]+=" H=" +str(expanded.data.H)
             if not expanded.isGoal():
-                print(str(expanded))
-                expand(expanded)
-                if expanded.left!=None:
-                    check.append(expanded.left)
-                if expanded.up!=None:
-                    check.append(expanded.up)
-                if expanded.down!=None:
-                    check.append(expanded.down)
-                if expanded.right!=None:
-                    check.append(expanded.right)
-                for n in fringe:
-                    for m in check:
-                        if n.isIdentical(m): check.remove(m)
-                    if not check: break
-                else:
-                    fringe.extend(check)
-        else: return "Solution Path Found: " + expanded.name
-        return "No Solution"
-
-def astarselect(fringe):
+                # if not it or (it and expanded.F==depth):
+                #     print(str(expanded)) #<--for debugging...
+                if not depth or (depth-1)>=fringe[len(fringe)-1].F:
+                    expand(expanded)
+                    if expanded.left:
+                        check.append(expanded.left)
+                    if expanded.up:
+                        check.append(expanded.up)
+                    if expanded.down:
+                        check.append(expanded.down)
+                    if expanded.right:
+                        check.append(expanded.right)
+                    for n in range(len(fringe)):
+                        for m in check:
+                            if fringe[n].isIdentical(m):
+                                if fringe[n].F<m.F:
+                                    fringe[n]=m
+                                check.remove(m)
+                        if not check: break
+                    else:
+                        fringe.extend(check)
+                    if it and not fringe:
+                        depth+=1
+                        fringe.append(NPnode, "Start")
+            else:
+                return (stringifyResults(expanded, fun, depth, it), elist)
+        if depth:
+            return ("No solution found within " +str(depth)+" moves.", elist)
+        else:
+            return ("No solution found using "+searchName(fun), elist)
+def astarselect(fringe, depth):
     fringe=deque(sorted(fringe, key=lambda state: state.data.H))
     expanded=fringe.pop()
     return (expanded, fringe)
 
-def uniformselect(fringe):
+def uniformselect(fringe, depth):
     fringe=deque(sorted(fringe, key=lambda state: state.F))
     expanded=fringe.pop()
     return (expanded, fringe)
 
-def depthselect(fringe):
+def depthselect(fringe, depth):
     expanded=fringe.pop()
     return (expanded, fringe)
 
-def breadthselect(fringe):
+def breadthselect(fringe, depth):
     expanded=fringe.popleft()
     return (expanded, fringe)
+
+def stringifyResults(Solution, fun, depth=None, it=False):
+    '''returns a String with the Solution Path, search type, cost, and max depth allowed (last two if applicable)'''
+        res=str(Solution.data.size-1)+"-Puzzle using "
+        res+=searchName(fun, depth, it)
+        res+="\nSolution Path Found in "
+        res+=str(Solution.F)
+        res+=" moves:\n"+Solution.name
+        return res
+
+def searchName(fun, depth=None, it=False):
+    if fun==astarselect:
+        return "A* Search"
+    elif fun==uniformselect:
+        return "Uniform Cost Search"
+    elif fun==depthselect:
+        if not depth: return "Depth-First Search"
+        elif it: return "Iterative-Deepning"
+        else: "Depth-Limited Search with limit at " +str(depth)
+    elif fun==breadthselect:
+        return "Breadth-First Search"

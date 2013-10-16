@@ -8,6 +8,8 @@ class NumPuzz:
     # prevdist is for using the heuristics, so this would be the combined weight of edges
     # traversed in the search tree to reach the curren state.
     # goal is a list to represent the goal state of the puzzle.
+    # for cost purposes: self.F=total cost to get to this state,
+    #   self.G=Manhatta Distance to Goal State from curren state, self.H=Total Heuristic Value (F+G)
     def __init__(self, size, order=['B'], goal=None, prev=None, prevdist=-1):
         self.size=size**2
         self.bound=size
@@ -19,8 +21,8 @@ class NumPuzz:
         self.B=self.order.index('B')
         self.moves={"L": True, "U": True, "D": True, "R": True}
         self.possibleMoves()
-        if prev!=None: self.moves[prev]=False
-        if goal!=None:
+        if prev: self.moves[prev]=False
+        if goal:
             self.goal=goal
             self.manhattanDistance()
             self.H=self.F+self.G
@@ -145,3 +147,12 @@ class NumPuzz:
     
     def isGoal(self):
         return self.order==self.goal
+
+    def reset(self):
+        self.order=self.goal.copy()
+        self.F=0
+        self.B=self.order.index('B')
+        self.moves={"L": True, "U": True, "D": True, "R": True}
+        self.possibleMoves()
+        self.manhattanDistance()
+        self.H=self.F+self.G
