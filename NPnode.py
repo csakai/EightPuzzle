@@ -2,6 +2,7 @@ class NPnode:
     
     def __init__(self, numpuzz, name):
         self.data=numpuzz
+        self.F=numpuzz.F
         self.name=name
         self.left=None
         self.right=None
@@ -25,32 +26,32 @@ class NPnode:
     # a note: These comparison operators are for comparing HEURISTICS, not actual state.
     def __lt__(self, other):
         if isinstance(other, NPnode):
-            return self.data<other.data
+            return self.F<other.F
         else: return NotImplemented
 
     def __le__(self, other):
         if isinstance(other, NPnode):
-            return self.data<=other.data
+            return self.F<=other.F
         else: return NotImplemented
 
     def __eq__(self, other):
         if isinstance(other, NPnode):
-            return self.data==other.data
+            return self.F==other.F
         else: return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, NPnode):
-            return self.data!=other.data
+            return self.F!=other.F
         else: return NotImplemented
 
     def __ge__(self, other):
         if isinstance(other, NPnode):
-            return self.data>=other.data
+            return self.F>=other.F
         else: return NotImplemented
 
     def __gt__(self, other):
         if isinstance(other, NPnode):
-            return self.data>other.data
+            return self.F>other.F
         else: return NotImplemented
 
     def __str__(self):

@@ -11,7 +11,7 @@ class NumPuzz:
     def __init__(self, size, order=['B'], goal=None, prev=None, prevdist=-1):
         self.size=size**2
         self.bound=size
-        self.G=prevdist+1
+        self.F=prevdist+1
         if len(order)!=self.size or order==['B']:
             self.order=['B'].extend([n for n in range(1,self.size)])
         else:
@@ -23,6 +23,7 @@ class NumPuzz:
         if goal!=None:
             self.goal=goal
             self.manhattanDistance()
+            self.H=self.F+self.G
         else:
             self.goal=None
 
@@ -35,32 +36,32 @@ class NumPuzz:
 # a note: These comparison operators are for comparing HEURISTICS, not actual state.
     def __lt__(self, other):
         if isinstance(other, NumPuzz):
-            return self.G+self.H<other.G+other.H
+            return self.H<other.H
         else: return NotImplemented
 
     def __le__(self, other):
         if isinstance(other, NumPuzz):
-            return self.G+self.H<=other.G+other.H
+            return self.H<=other.H
         else: return NotImplemented
 
     def __eq__(self, other):
         if isinstance(other, NumPuzz):
-            return self.G+self.H==other.G+other.H
+            return self.H==other.H
         else: return NotImplemented
 
     def __ne__(self, other):
         if isinstance(other, NumPuzz):
-            return self.G+self.H!=other.G+other.H
+            return self.H!=other.H
         else: return NotImplemented
 
     def __ge__(self, other):
         if isinstance(other, NumPuzz):
-            return self.G+self.H>=other.G+other.H
+            return self.H>=other.H
         else: return NotImplemented
 
     def __gt__(self, other):
         if isinstance(other, NumPuzz):
-            return self.G+self.H>other.G+other.H
+            return self.H>other.H
         else: return NotImplemented
 
 
@@ -68,25 +69,25 @@ class NumPuzz:
         leftorder=self.order.copy()
         leftorder[self.B]=self.order[self.B+1]
         leftorder[self.B+1]='B'
-        return NumPuzz(self.bound, leftorder, self.goal, "R", self.G)
+        return NumPuzz(self.bound, leftorder, self.goal, "R", self.F)
 
     def right(self):
         rightorder=self.order.copy()
         rightorder[self.B]=self.order[self.B-1]
         rightorder[self.B-1]='B'
-        return NumPuzz(self.bound, rightorder, self.goal, "L", self.G)
+        return NumPuzz(self.bound, rightorder, self.goal, "L", self.F)
 
     def up(self):
         uporder=self.order.copy()
         uporder[self.B]=self.order[self.B+self.bound]
         uporder[self.B+self.bound]='B'
-        return NumPuzz(self.bound, uporder, self.goal, "D", self.G)
+        return NumPuzz(self.bound, uporder, self.goal, "D", self.F)
 
     def down(self):
         downorder=self.order.copy()
         downorder[self.B]=self.order[self.B-self.bound]
         downorder[self.B-self.bound]='B'
-        return NumPuzz(self.bound, downorder, self.goal, "U", self.G)
+        return NumPuzz(self.bound, downorder, self.goal, "U", self.F)
 
     def __str__(puzzle):
         s=str(puzzle.size-1)
@@ -130,11 +131,11 @@ class NumPuzz:
     #     while errors is not empty:
 
     def manhattanDistance(self):
-        self.H=0
+        self.G=0
         for n in range(len(self.order)):
             if self.order[n]!='B':
-                self.H+=abs(self.vDist(n, self.goal.index(self.order[n])))
-                self.H+=abs(self.hDist(n, self.goal.index(self.order[n])))
+                self.G+=abs(self.vDist(n, self.goal.index(self.order[n])))
+                self.G+=abs(self.hDist(n, self.goal.index(self.order[n])))
 
     def vDist(self, n, m):
         return (n//self.bound)-(m//self.bound)

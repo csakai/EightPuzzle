@@ -72,7 +72,7 @@ def BFS(start):
     while len(fringe)>0:
         expanded=fringe.popleft()
         elist.append(expanded.name)
-                if not expanded.isGoal():
+        if not expanded.isGoal():
             print(str(expanded))
             expand(expanded)
             if expanded.left!=None:
@@ -141,3 +141,50 @@ def moardata(node):
     s+="H(n)=" + str(node.data.H)+"\n"
     s+="Potential Directions is " + str(node.data.moves)+"\n"
     return s
+
+def search(fun, start):
+    if start.isGoal():
+        return "Puzzle is already solved."
+    else:
+        fringe=deque([NPnode(start, "Start")])
+        elist=list()
+        while len(fringe)>0:
+            expanded, fringe = fun(fringe)
+            elist.append(expanded.name)
+            if not expanded.isGoal():
+                print(str(expanded))
+                expand(expanded)
+                if expanded.left!=None:
+                    check.append(expanded.left)
+                if expanded.up!=None:
+                    check.append(expanded.up)
+                if expanded.down!=None:
+                    check.append(expanded.down)
+                if expanded.right!=None:
+                    check.append(expanded.right)
+                for n in fringe:
+                    for m in check:
+                        if n.isIdentical(m): check.remove(m)
+                    if not check: break
+                else:
+                    fringe.extend(check)
+        else: return "Solution Path Found: " + expanded.name
+        return "No Solution"
+
+def astarselect(fringe):
+    fringe=deque(sorted(fringe, key=lambda state: state.data.H))
+    expanded=fringe.pop()
+    return (expanded, fringe)
+
+def uniformselect(fringe):
+    fringe=deque(sorted(fringe, key=lambda state: state.F))
+    expanded=fringe.pop()
+    return (expanded, fringe)
+
+def depthselect(fringe):
+    expanded=fringe.pop()
+    return (expanded, fringe)
+
+def breadthselect(fringe):
+    expanded=fringe.popleft()
+    return (expanded, fringe)
