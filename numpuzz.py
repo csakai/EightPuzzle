@@ -107,6 +107,22 @@ class NumPuzz:
                     s+="\n"
         return s
 
+    def goalString(self):
+        s=str(self.size-1)
+        s+=("-Puzzle Goal\n")
+        s+='| '
+        for n in range(self.size):
+            if self.goal[n]=='B' or self.goal[n]<10:
+                s+=' '
+            s+=str(self.goal[n])
+            s+=' | '
+            if (n+1)%self.bound==0:
+                if (n+1)<self.size:
+                    s+="\n| "
+                else:
+                    s+="\n"
+        return s
+
     def printGoal(self):
         s=str(self.size-1)
         s+=("-Puzzle Goal\n")
