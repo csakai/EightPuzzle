@@ -14,3 +14,6 @@ October 16: made the code more "pythonic" by defining one search function and in
 selection type as a function to the "search" function.
 A word of warning: If iterative deepning is used and there is no possible solution, the program will enter
 into an infinite loop.
+
+If you want to test the search functions, refer to NPdiagnostic.py and use the 
+"TestAllSearches(startV, stopV)" on line 31. It will write its results to a .txt file.
