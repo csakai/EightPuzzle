@@ -28,26 +28,36 @@ def defineMoves(test):
 
     return result
 
-def TestAllSearches(start, stop):
+def TestAllSearches(startV, stopV):
     start=NumPuzz(4, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 'B'], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 'B'])
-    with open('Testing'+str(start)+'-'+str(stop)+'.txt', 'w') as f:
+    with open('Testing'+str(startV)+'-'+str(stopV)+'.txt', 'w') as f:
         f.write(str(start)+"\n")
-        for testnum in range(start,stop+1):
-            f.write("Goal is:\n\n")
-            start.printGoal()
-            f.write("Randomizing for " +str(testnum)+" move solution...")
+        f.close()
+    for testnum in range(startV,stopV+1):
+        with open('Testing'+str(startV)+'-'+str(stopV)+'.txt', 'a') as f:
+            f.write("\nGoal is:\n")
+            f.write(start.goalString())
+            print("Randomizing for " +str(testnum)+"-move solution...")
             start=Randomize(testnum, start)
+            f.write("Testing all searches for randomized "+str(testnum)+"-move solution.\n")
             f.write(str(start))
-            f.write("Testing all searches.\n")
+            print("Testing all searches.\n")
+            #print("Testing DFS for "+str(testnum)+"-move.")
             #f.write(search(depthselect, start)[0]+"\n") #Tests standard DFS w/ cycle checking
+            print("Testing BFS for "+str(testnum)+"-move.")
             f.write(search(breadthselect, start)[0]+"\n") #Tests standard BFS w/ cycle checking
+            print("Testing UCS for "+str(testnum)+"-move.")
             f.write(search(uniformselect, start)[0]+"\n") #Tests uniform cost search w/ cycle checking
+            print("Testing DLS for "+str(testnum)+"-move.")
             f.write(search(depthselect, start, depth=testnum)[0]+"\n") #Tests depth-limited search w/ cycle checking
+            print("Testing IDS for "+str(testnum)+"-move.")
             f.write(search(depthselect, start, it=True)[0]+"\n") #Tests iterative-deepning with cycle checking
+            print("Testing A* for "+str(testnum)+"-move.")
             f.write(search(astarselect, start)[0]+"\n") #Tests A* search with cycle checking
             f.write("Searches for "+str(testnum)+" move solutions complete. Resetting board.\n")
             start.reset()
-        f.close()
-    print("Testing for " +str(start)+" through "+str(stop)+" has been completed.")
-    print("Look for a file named 'Testing "+str(start)+"-"+str(stop)+".txt' in this program's"+
+            f.close()
+
+    print("Testing for " +str(startV)+" through "+str(stopV)+" has been completed.")
+    print("Look for a file named 'Testing "+str(startV)+"-"+str(stopV)+".txt' in this program's"+
         " home directory.")
