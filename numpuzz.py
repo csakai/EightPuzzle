@@ -96,6 +96,8 @@ class NumPuzz:
         s+=("-Puzzle\n")
         s+='| '
         for n in range(puzzle.size):
+            if puzzle.order[n]=='B' or puzzle.order[n]<10:
+                s+=' '
             s+=str(puzzle.order[n])
             s+=' | '
             if (n+1)%puzzle.bound==0:
@@ -110,6 +112,8 @@ class NumPuzz:
         s+=("-Puzzle Goal\n")
         s+='| '
         for n in range(self.size):
+            if self.goal[n]=='B' or self.goal[n]<10:
+                s+=' '
             s+=str(self.goal[n])
             s+=' | '
             if (n+1)%self.bound==0:

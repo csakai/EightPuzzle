@@ -28,7 +28,7 @@ def Randomize(complexity, start):
         if n==complexity-1:
             start.moves[to]=True
         dirs.clear()
-
+    start.F=0
     print("Puzzle can be solved in at least " + str(complexity) + " moves.")
     return start
 
@@ -157,14 +157,15 @@ def search(fun, start, depth=None, it=False):
         fringe=deque([NPnode(start, "Start")])
         elist=list()
         while len(fringe)>0:
-            expanded, fringe = fun(fringe, depth)
+            expanded, fringe = fun(fringe)
             elist.append(expanded.name)
             if fun==astarselect: elist[len(elist)-1]+=" H=" +str(expanded.data.H)
             if not expanded.isGoal():
                 # if not it or (it and expanded.F==depth):
                 #     print(str(expanded)) #<--for debugging...
-                if not depth or (depth-1)>=fringe[len(fringe)-1].F:
+                if not depth or (depth-1)>=expanded.F:
                     expand(expanded)
+                    check=list()
                     if expanded.left:
                         check.append(expanded.left)
                     if expanded.up:
@@ -182,41 +183,41 @@ def search(fun, start, depth=None, it=False):
                         if not check: break
                     else:
                         fringe.extend(check)
-                    if it and not fringe:
-                        depth+=1
-                        fringe.append(NPnode, "Start")
+                elif it and not fringe:
+                    depth+=1
+                    fringe.append(NPnode(start, "Start"))
             else:
                 return (stringifyResults(expanded, fun, depth, it), elist)
         if depth:
             return ("No solution found within " +str(depth)+" moves.", elist)
         else:
             return ("No solution found using "+searchName(fun), elist)
-def astarselect(fringe, depth):
-    fringe=deque(sorted(fringe, key=lambda state: state.data.H))
+def astarselect(fringe):
+    fringe=deque(sorted(fringe, key=lambda state: state.data.H, reverse=True))
     expanded=fringe.pop()
     return (expanded, fringe)
 
-def uniformselect(fringe, depth):
-    fringe=deque(sorted(fringe, key=lambda state: state.F))
+def uniformselect(fringe):
+    fringe=deque(sorted(fringe, key=lambda state: state.F, reverse=True))
     expanded=fringe.pop()
     return (expanded, fringe)
 
-def depthselect(fringe, depth):
+def depthselect(fringe):
     expanded=fringe.pop()
     return (expanded, fringe)
 
-def breadthselect(fringe, depth):
+def breadthselect(fringe):
     expanded=fringe.popleft()
     return (expanded, fringe)
 
 def stringifyResults(Solution, fun, depth=None, it=False):
-    '''returns a String with the Solution Path, search type, cost, and max depth allowed (last two if applicable)'''
-        res=str(Solution.data.size-1)+"-Puzzle using "
-        res+=searchName(fun, depth, it)
-        res+="\nSolution Path Found in "
-        res+=str(Solution.F)
-        res+=" moves:\n"+Solution.name
-        return res
+    '''returns a String with the Solution Path, search type, cost, and max depth allowed (if applicable)'''
+    res=str(Solution.data.size-1)+"-Puzzle using "
+    res+=searchName(fun, depth, it)
+    res+="\nSolution Path Found in "
+    res+=str(Solution.F)
+    res+=" moves:\n"+Solution.name
+    return res
 
 def searchName(fun, depth=None, it=False):
     if fun==astarselect:
@@ -225,7 +226,7 @@ def searchName(fun, depth=None, it=False):
         return "Uniform Cost Search"
     elif fun==depthselect:
         if not depth: return "Depth-First Search"
-        elif it: return "Iterative-Deepning"
-        else: "Depth-Limited Search with limit at " +str(depth)
+        elif it: return "Iterative-Deepening"
+        else: return "Depth-Limited Search with limit at " +str(depth)
     elif fun==breadthselect:
         return "Breadth-First Search"
