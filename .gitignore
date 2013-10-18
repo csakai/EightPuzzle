@@ -1,2 +1,2 @@
-*.txt # do away with unnecessary test files
-__pycache__/ # I don't think commiting this is doing me any favors
+*.txt
+__pycache__/
