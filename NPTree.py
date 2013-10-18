@@ -121,8 +121,8 @@ def AstarDiagnostic(start):
     if expanded.isGoal():
         print("Puzzle is already solved.")
     elist=list()
-    while len(fringe)<10:
-        fringe=sorted(fringe, reverse=True)
+    while len(fringe)<600:
+        fringe=deque(sorted(fringe, key=lambda state: state.data.H, reverse=True))
         expanded=fringe.pop()
         elist.append(expanded.name)
         if not expanded.isGoal():
@@ -137,14 +137,15 @@ def AstarDiagnostic(start):
 
 def moardata(node):
     s="Index of B is " + str(node.data.B)+"\n"
-    s+="Weight of Path to this node is " + str(node.data.G)+"\n"
+    s+="Weight of Path to this node is " + str(node.data.F)+"\n"
+    s+="Estimated Weight to Goal is " + str(node.data.G)+"\n"
     s+="H(n)=" + str(node.data.H)+"\n"
     s+="Potential Directions is " + str(node.data.moves)+"\n"
     return s
 
 #the following function is a culmination for the search functions.
 #To use it, just input
-def search(fun, start, depth=None, it=False):
+def search(fun, start, depth=None, it=False, debug=False):
     '''This function allows you to run all tree-based search functions. All you need to do is 
         provide the type of next-node selection to the parameter 'fun'. If you are using Depth-Limited
         Search, then you provide depth, otherwise that parameter is unnecessary. This function will
@@ -161,8 +162,8 @@ def search(fun, start, depth=None, it=False):
             elist.append(expanded.name)
             if fun==astarselect: elist[len(elist)-1]+=" H=" +str(expanded.data.H)
             if not expanded.isGoal():
-                # if not it or (it and expanded.F==depth):
-                #     print(str(expanded)) #<--for debugging...
+                if debug and (not it or (it and expanded.F==depth)):
+                    print(str(expanded)) #<--for debugging...
                 if not depth or (depth-1)>=expanded.F:
                     expand(expanded)
                     check=list()
